@@ -1,0 +1,41 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'src/**'
+      - 'lib/**'
+      - 'xmake.lua'
+      - '.github/workflows/build.yml'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+
+      - name: Configure
+        run: xmake f -m release -a x64 -y
+
+      - name: Build
+        run: xmake build -y
+
+      - name: Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item "build\windows\x64\release\TweakXL.dll" dist\
+          if (Test-Path Scripts) { Copy-Item -Recurse Scripts dist\Scripts }
+          Get-ChildItem -Recurse dist | Select-Object FullName, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TweakXL-2.5
+          path: dist
