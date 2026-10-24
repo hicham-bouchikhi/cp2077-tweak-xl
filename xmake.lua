@@ -34,7 +34,7 @@ else
     set_runtimes("MD")
 end
 
-add_requires("hopscotch-map", "minhook", "spdlog", "tiltedcore", "yaml-cpp", "mimalloc")
+add_requires("hopscotch-map", "minhook", "spdlog", "tiltedcore", "yaml-cpp", "mimalloc", {configs = {shared = false}})
 
 target("TweakXL")
     set_default(true)
